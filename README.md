@@ -1,1 +1,3 @@
-"# Common_PowerShell_scripts" 
+# 注意
+
+文件编码 格式为：GBK
