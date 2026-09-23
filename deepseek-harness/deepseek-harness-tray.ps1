@@ -21,6 +21,7 @@ $title    = 'deepseek-harness web'
 $script:busy = $false
 $script:iconOn = $null
 $script:iconOff = $null
+$script:lastPhase = $null
 
 # Balloon for processes that have no tray icon of their own (e.g. a refused duplicate).
 # The pump is required: a balloon is drawn by the shell while this process keeps pumping
@@ -149,6 +150,14 @@ function Initialize-Icons {
 
 function Refresh-Ui {
     $s = Get-Phase
+
+    # Transition-based notification: the tray already recomputes phase every tick, so a
+    # "startup finished" tip is just an edge on that state machine - no separate watcher.
+    if ($script:lastPhase -and $script:lastPhase -ne 'running' -and $s.Name -eq 'running') {
+        Show-Balloon "启动完成，端口 $port 已就绪 (PID $($s.PortPid))。" $false
+    }
+    $script:lastPhase = $s.Name
+
     switch ($s.Name) {
         'running' {
             $miState.Text  = "状态: 运行中  (端口 $port / PID $($s.PortPid))"
